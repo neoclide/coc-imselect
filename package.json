@@ -1,0 +1,55 @@
+{
+  "name": "coc-imselect",
+  "version": "0.0.1",
+  "description": "Input method extension for coc.nvim on mac.",
+  "main": "lib/index.js",
+  "publisher": "chemzqm",
+  "keywords": [
+    "coc.nvim",
+    "input",
+    "colors"
+  ],
+  "engines": {
+    "coc": "^0.0.57"
+  },
+  "scripts": {
+    "clean": "rimraf lib",
+    "build": "tsc -p tsconfig.json",
+    "postinstall": "./build.sh",
+    "prepare": "yarn clean && yarn build"
+  },
+  "activationEvents": [
+    "*"
+  ],
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "imselect.cursorHighlight": {
+          "type": "string",
+          "default": "65535,65535,0",
+          "description": "Cursor highlight for none english input source."
+        },
+        "imselect.enableStatusItem": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  },
+  "author": "chemzqm@gmail.com",
+  "license": "MIT",
+  "devDependencies": {
+    "@chemzqm/tsconfig": "^0.0.3",
+    "@chemzqm/tslint-config": "^1.0.18",
+    "@types/node": "^10.12.24",
+    "coc.nvim": "^0.0.57",
+    "rimraf": "^2.6.3",
+    "tslint": "^5.12.1",
+    "typescript": "^3.3.3"
+  },
+  "dependencies": {
+    "node-pty": "^0.8.1",
+    "tslib": "^1.9.3"
+  }
+}
