@@ -78,11 +78,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
     callback: selectDefault
   }))
 
-  subscriptions.push(workspace.registerAutocmd({
-    event: 'CmdlineLeave',
-    request: true,
-    callback: selectDefault
-  }))
+  //   subscriptions.push(workspace.registerAutocmd({
+  //     event: 'CmdlineLeave',
+  //     request: true,
+  //     callback: selectDefault
+  //   }))
 
   events.on('InsertEnter', async () => {
     let { bufnr } = workspace
