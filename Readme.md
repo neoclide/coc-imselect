@@ -19,6 +19,8 @@ In your vim/neovim, run command:
 
 ## Options
 
+- `imselect.defaultInput` default input source use in normal mode, default to `com.apple.keylayout.US`.
+
 - `imselect.cursorHighlight` highlight cursor color, default to `65535,65535,0`.
 
   The syntax for color is `red,green,blue` where each value is a number between 0 and 65535.
