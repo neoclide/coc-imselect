@@ -25,6 +25,11 @@
     "configuration": {
       "type": "object",
       "properties": {
+        "imselect.defaultInput": {
+          "type": "string",
+          "default": "com.apple.keylayout.US",
+          "description": "default input source use in normal mode"
+        },
         "imselect.cursorHighlight": {
           "type": "string",
           "default": "65535,65535,0",

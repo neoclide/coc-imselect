@@ -5,7 +5,6 @@ const pty = require('node-pty')
 
 const method_cache: Map<number, string> = new Map()
 
-let defaultInput = 'com.apple.keylayout.US'
 let currentMethod: string
 let currentLang: string
 let defaultColor: Color
@@ -14,6 +13,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   let { subscriptions, logger } = context
   let config = workspace.getConfiguration('imselect')
   let highlights = config.get<string>('cursorHighlight', '65535,65535,0').split(/,\s*/)
+  let defaultInput = config.get<string>('defaultInput', 'com.apple.keylayout.US')
 
   async function selectDefault(): Promise<void> {
     if (currentLang == 'en') return
