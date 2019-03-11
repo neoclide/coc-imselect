@@ -1,7 +1,7 @@
 import { events, ExtensionContext, workspace, StatusBarItem } from 'coc.nvim'
 import path from 'path'
 import { Color, getColor, selectInput, setColor } from './util'
-const pty = require('node-pty')
+const isPkg = process.hasOwnProperty('pkg')
 
 const method_cache: Map<number, string> = new Map()
 
@@ -14,6 +14,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
   let config = workspace.getConfiguration('imselect')
   let highlights = config.get<string>('cursorHighlight', '65535,65535,0').split(/,\s*/)
   let defaultInput = config.get<string>('defaultInput', 'com.apple.keylayout.US')
+  const pty = require('node-pty')
+  if (isPkg) {
+    workspace.showMessage(`coc-imselect can't work with binary release of coc.nvim`, 'warning')
+    return
+  }
 
   async function selectDefault(): Promise<void> {
     if (currentLang == 'en') return

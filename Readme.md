@@ -4,6 +4,8 @@ Input method enhance for iTerm2 on mac.
 
 ![2019-02-26 15_11_49](https://user-images.githubusercontent.com/251450/53394376-0de0c980-39da-11e9-8d6f-8006f98af84f.gif)
 
+This extension only works with coc.nvim that build from source code.
+
 ## Install
 
 In your vim/neovim, run command:
