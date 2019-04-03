@@ -4,15 +4,17 @@ Input method enhance for iTerm2 on mac.
 
 ![2019-02-26 15_11_49](https://user-images.githubusercontent.com/251450/53394376-0de0c980-39da-11e9-8d6f-8006f98af84f.gif)
 
-This extension only works with coc.nvim that build from source code.
+This extension only works with neovim and when loaded as vim plugin.
 
 ## Install
 
-In your vim/neovim, run command:
+For [vim-plug](https://github.com/junegunn/vim-plug) user, add
 
+```vim
+Plug 'neoclide/coc-imselect'
 ```
-:CocInstall coc-imselect
-```
+
+to your init.vim, and run `:PlugUpdate`
 
 ## Features
 

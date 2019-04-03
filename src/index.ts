@@ -1,5 +1,4 @@
 import { events, ExtensionContext, workspace, StatusBarItem } from 'coc.nvim'
-import path from 'path'
 import { Color, getColor, selectInput, setColor } from './util'
 const isPkg = process.hasOwnProperty('pkg')
 
@@ -14,7 +13,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
   let config = workspace.getConfiguration('imselect')
   let highlights = config.get<string>('cursorHighlight', '65535,65535,0').split(/,\s*/)
   let defaultInput = config.get<string>('defaultInput', 'com.apple.keylayout.US')
-  const pty = require('node-pty')
   if (isPkg) {
     workspace.showMessage(`coc-imselect can't work with binary release of coc.nvim`, 'warning')
     return
@@ -36,17 +34,9 @@ export async function activate(context: ExtensionContext): Promise<void> {
     statusItem.show()
   }
 
-  let cmd = path.join(__dirname, '../bin/observer')
-  let cp = pty.spawn(cmd, [], {
-    name: 'xterm-color',
-    cols: 80,
-    rows: 30,
-    env: process.env
-  })
-
-  cp.on('data', async line => {
-    line = line.trim()
-    let parts = line.split(/\s/, 2)
+  async function checkCurrentInput(curr: string): Promise<void> {
+    curr = curr.trim()
+    let parts = curr.split(/\s/, 2)
     currentLang = parts[0]
     currentMethod = parts[1]
     if (currentLang == 'en') {
@@ -59,22 +49,18 @@ export async function activate(context: ExtensionContext): Promise<void> {
     if (statusItem) {
       statusItem.text = currentLang
     }
-  })
+  }
 
-  cp.on('exit', code => {
-    if (code != 0) {
-      workspace.showMessage(`imselect observer exited with ${code}`)
-    }
+  let { nvim } = workspace
+  nvim.getVar('current_input').then(checkCurrentInput).catch(_e => {
+    // noop
   })
+  workspace.watchGlobal('current_input', async (_, newValue) => {
+    await checkCurrentInput(newValue)
+  }, subscriptions)
 
   getColor().then(color => {
     defaultColor = color
-  })
-
-  subscriptions.push({
-    dispose: () => {
-      cp.kill()
-    }
   })
 
   subscriptions.push(workspace.registerAutocmd({
