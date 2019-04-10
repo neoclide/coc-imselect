@@ -35,12 +35,14 @@ export async function activate(context: ExtensionContext): Promise<void> {
     let parts = curr.split(/\s/, 2)
     currentLang = parts[0]
     currentMethod = parts[1]
-    if (currentLang == 'en' && isTerm) {
-      if (defaultColor) {
-        await setColor(defaultColor.red, defaultColor.green, defaultColor.blue)
+    if (isTerm) {
+      if (currentLang == 'en') {
+        if (defaultColor) {
+          await setColor(defaultColor.red, defaultColor.green, defaultColor.blue)
+        }
+      } else {
+        await setColor(highlights[0], highlights[1], highlights[2])
       }
-    } else {
-      await setColor(highlights[0], highlights[1], highlights[2])
     }
     if (statusItem) {
       statusItem.text = currentLang
