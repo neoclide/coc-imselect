@@ -1,6 +1,6 @@
 {
   "name": "coc-imselect",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Input method extension for coc.nvim on mac.",
   "main": "lib/index.js",
   "publisher": "chemzqm",
