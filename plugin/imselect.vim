@@ -13,6 +13,9 @@ function! s:on_exit()
 endfunction
 
 function! s:StartOberver()
+  if !has('nvim') || $TERM_PROGRAM !=? 'iTerm.app'
+    return
+  endif
   let cmd = s:root.'/bin/observer'
   let id = jobstart([cmd], {
         \ 'pty': 1,
