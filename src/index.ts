@@ -1,8 +1,8 @@
 import { events, ExtensionContext, workspace, StatusBarItem } from 'coc.nvim'
 import { Color, getColor, selectInput, setColor } from './util'
-const isPkg = process.hasOwnProperty('pkg')
 
 const method_cache: Map<number, string> = new Map()
+const isTerm = process.env.TERM_PROGRAM = 'iTerm.app'
 
 let currentMethod: string
 let currentLang: string
@@ -13,10 +13,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
   let config = workspace.getConfiguration('imselect')
   let highlights = config.get<string>('cursorHighlight', '65535,65535,0').split(/,\s*/)
   let defaultInput = config.get<string>('defaultInput', 'com.apple.keylayout.US')
-  if (isPkg) {
-    workspace.showMessage(`coc-imselect can't work with binary release of coc.nvim`, 'warning')
-    return
-  }
 
   async function selectDefault(): Promise<void> {
     if (currentLang == 'en') return
@@ -39,7 +35,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     let parts = curr.split(/\s/, 2)
     currentLang = parts[0]
     currentMethod = parts[1]
-    if (currentLang == 'en') {
+    if (currentLang == 'en' && isTerm) {
       if (defaultColor) {
         await setColor(defaultColor.red, defaultColor.green, defaultColor.blue)
       }
@@ -58,10 +54,13 @@ export async function activate(context: ExtensionContext): Promise<void> {
   workspace.watchGlobal('current_input', async (_, newValue) => {
     await checkCurrentInput(newValue)
   }, subscriptions)
-
-  getColor().then(color => {
-    defaultColor = color
-  })
+  if (isTerm) {
+    getColor().then(color => {
+      defaultColor = color
+    }, _e => {
+      // noop
+    })
+  }
 
   subscriptions.push(workspace.registerAutocmd({
     event: 'VimLeavePre',
