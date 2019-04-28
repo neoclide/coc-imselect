@@ -16,7 +16,7 @@
     "clean": "rimraf lib",
     "build": "tsc -p tsconfig.json",
     "postinstall": "./build.sh",
-    "prepare": "yarn clean && yarn build"
+    "prepare": "npx npm-run-all clean build"
   },
   "activationEvents": [
     "*"
