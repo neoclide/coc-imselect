@@ -2,7 +2,7 @@ import { events, ExtensionContext, workspace, StatusBarItem } from 'coc.nvim'
 import { Color, getColor, selectInput, setColor } from './util'
 
 const method_cache: Map<number, string> = new Map()
-const isTerm = process.env.TERM_PROGRAM = 'iTerm.app'
+const isTerm = process.env.TERM_PROGRAM == 'iTerm.app'
 
 let currentMethod: string
 let currentLang: string
