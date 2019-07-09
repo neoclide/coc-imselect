@@ -8,14 +8,11 @@ This extension works with vim8 and neovim, latest [coc.nvim](https://github.com/
 
 ## Install
 
-For [vim-plug](https://github.com/junegunn/vim-plug) user, add
+Install [coc.nvim](https://github.com/neoclide/coc.nvim), then run command:
 
 ```vim
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'neoclide/coc-imselect'
+CocInstall coc-imselect
 ```
-
-to your init.vim, and run `:PlugUpdate`
 
 ## Features
 

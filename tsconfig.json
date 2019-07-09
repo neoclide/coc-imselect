@@ -4,6 +4,7 @@
     "outDir": "lib",
     "target": "es2017",
     "module": "commonjs",
+    "noUnusedLocals": true,
     "moduleResolution": "node",
     "lib": ["es2018"],
     "plugins": []
