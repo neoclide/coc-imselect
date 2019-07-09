@@ -10,7 +10,7 @@
     "colors"
   ],
   "engines": {
-    "coc": "^0.0.57"
+    "coc": "^0.0.72"
   },
   "scripts": {
     "clean": "rimraf lib",
@@ -30,11 +30,6 @@
           "default": "com.apple.keylayout.US",
           "description": "default input source use in normal mode"
         },
-        "imselect.cursorHighlight": {
-          "type": "string",
-          "default": "65535,65535,0",
-          "description": "Cursor highlight for none english input source."
-        },
         "imselect.enableStatusItem": {
           "type": "boolean",
           "default": true
@@ -48,7 +43,7 @@
     "@chemzqm/tsconfig": "^0.0.3",
     "@chemzqm/tslint-config": "^1.0.18",
     "@types/node": "^10.12.24",
-    "coc.nvim": "^0.0.57",
+    "coc.nvim": "^0.0.72",
     "rimraf": "^2.6.3",
     "tslint": "^5.12.1",
     "typescript": "^3.3.3"
