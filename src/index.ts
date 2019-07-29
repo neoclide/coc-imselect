@@ -80,14 +80,15 @@ export async function activate(context: ExtensionContext): Promise<void> {
     callback: selectDefault
   }))
 
-  subscriptions.push(workspace.registerAutocmd({
-    event: 'CmdlineLeave',
-    request: false,
-    callback: async () => {
-      let mode = await workspace.nvim.call('mode') as string
-      if (mode.startsWith('n')) await selectDefault()
-    }
-  }))
+  // subscriptions.push(workspace.registerAutocmd({
+  //   event: 'CmdlineLeave',
+  //   request: false,
+  //   callback: async () => {
+  //     let m = await workspace.nvim.mode
+  //     if (m.blocking) return
+  //     if (m.mode.startsWith('n')) await selectDefault()
+  //   }
+  // }))
 
   events.on('InsertEnter', async () => {
     let { bufnr } = workspace
