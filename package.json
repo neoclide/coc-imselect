@@ -30,6 +30,11 @@
           "default": "com.apple.keylayout.US",
           "description": "default input source use in normal mode"
         },
+        "imselect.enableFloating": {
+          "type": "string",
+          "default": true,
+          "description": "Enable floating for input method when possible"
+        },
         "imselect.enableStatusItem": {
           "type": "boolean",
           "default": true

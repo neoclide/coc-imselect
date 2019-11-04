@@ -19,6 +19,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   let { nvim } = workspace
   let config = workspace.getConfiguration('imselect')
   let defaultInput = config.get<string>('defaultInput', 'com.apple.keylayout.US')
+  let enableFloating = config.get<boolean>('enableFloating', true)
   let floatFactory = new FloatFactory(nvim, workspace.env, true, 1, 100, true)
   let cmd = path.join(__dirname, '../bin/observer')
   let task = workspace.createTask('IMSELECT')
@@ -34,12 +35,14 @@ export async function activate(context: ExtensionContext): Promise<void> {
     currentLang = parts[0]
     currentMethod = parts[1]
     if (timer) clearTimeout(timer)
-    floatFactory.create([{ content: currentLang, filetype: '' }], false, 0).catch(e => {
-      logger.error(e)
-    })
-    timer = setTimeout(() => {
-      floatFactory.close()
-    }, 500)
+    if (enableFloating) {
+      floatFactory.create([{ content: currentLang, filetype: '' }], false, 0).catch(e => {
+        logger.error(e)
+      })
+      timer = setTimeout(() => {
+        floatFactory.close()
+      }, 500)
+    }
     // show float buffer
     if (statusItem) {
       statusItem.text = currentLang

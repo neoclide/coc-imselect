@@ -23,6 +23,7 @@ CocInstall coc-imselect
 
 - `imselect.defaultInput` default input source use in normal mode, default to `com.apple.keylayout.US`.
 - `imselect.enableStatusItem` enable status item in statusline.
+- `imselect.enableFloating` enable floating window support for input method.
 
 ## License
 
