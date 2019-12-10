@@ -30,6 +30,11 @@
           "default": "com.apple.keylayout.US",
           "description": "default input source use in normal mode"
         },
+        "imselect.defaultInsertInput": {
+          "type": "string",
+          "default": "",
+          "description": "default input source when enter insert mode"
+        },
         "imselect.enableFloating": {
           "type": "string",
           "default": true,

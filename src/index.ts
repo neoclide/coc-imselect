@@ -19,6 +19,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   let { nvim } = workspace
   let config = workspace.getConfiguration('imselect')
   let defaultInput = config.get<string>('defaultInput', 'com.apple.keylayout.US')
+  let defaultInsertInput = config.get<string>('defaultInsertInput', '')
   let enableFloating = config.get<boolean>('enableFloating', true)
   let floatFactory = new FloatFactory(nvim, workspace.env, true, 1, 100, true)
   let cmd = path.join(__dirname, '../bin/observer')
@@ -94,8 +95,13 @@ export async function activate(context: ExtensionContext): Promise<void> {
   // }))
 
   events.on('InsertEnter', async () => {
-    let { bufnr } = workspace
-    let method = method_cache.get(bufnr)
+    let method = ''
+    if (defaultInsertInput.length === 0) {
+      let { bufnr } = workspace
+      method = method_cache.get(bufnr)
+    }else{
+      method = defaultInsertInput
+    }
     if (method && method != currentMethod) {
       await selectInput(method)
     }
