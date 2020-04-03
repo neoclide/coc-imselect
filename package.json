@@ -1,6 +1,6 @@
 {
   "name": "coc-imselect",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Input method extension for coc.nvim on mac.",
   "main": "lib/index.js",
   "publisher": "chemzqm",
@@ -36,7 +36,7 @@
           "description": "default input source when enter insert mode"
         },
         "imselect.enableFloating": {
-          "type": "string",
+          "type": "boolean",
           "default": true,
           "description": "Enable floating for input method when possible"
         },
