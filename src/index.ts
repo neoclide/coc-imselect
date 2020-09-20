@@ -63,7 +63,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
   })
 
   async function selectDefault(): Promise<void> {
-    if (currentLang == 'en') return
     try {
       await selectInput(defaultInput)
     } catch (e) {
