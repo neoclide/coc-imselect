@@ -1,8 +1,8 @@
-import { events, FloatFactory, ExtensionContext, StatusBarItem, workspace } from 'coc.nvim'
-import path from 'path'
 import { exec } from 'child_process'
-import { promisify } from 'util'
+import { events, ExtensionContext, FloatFactory, StatusBarItem, window, workspace } from 'coc.nvim'
 import os from 'os'
+import path from 'path'
+import { promisify } from 'util'
 
 const method_cache: Map<number, string> = new Map()
 let currentMethod: string
@@ -20,7 +20,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   let config = workspace.getConfiguration('imselect')
   let defaultInput = config.get<string>('defaultInput', 'com.apple.keylayout.US')
   let enableFloating = config.get<boolean>('enableFloating', true)
-  let floatFactory = new FloatFactory(nvim, workspace.env, true, 1, 100, true)
+  let floatFactory = new FloatFactory(nvim)
   let cmd = path.join(__dirname, '../bin/observer')
   let task = workspace.createTask('IMSELECT')
   let statusItem: StatusBarItem
@@ -36,7 +36,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     currentMethod = parts[1]
     if (timer) clearTimeout(timer)
     if (enableFloating) {
-      floatFactory.create([{ content: currentLang, filetype: '' }], false, 0).catch(e => {
+      floatFactory.show([{ content: currentLang, filetype: '' }]).catch(e => {
         logger.error(e)
       })
       timer = setTimeout(() => {
@@ -50,7 +50,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   })
   task.onExit(code => {
     if (code != 0) {
-      workspace.showMessage(`imselect observer exit with code ${code}`)
+      window.showMessage(`imselect observer exit with code ${code}`)
     }
   })
   task.start({
@@ -71,7 +71,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   }
 
   if (config.get<boolean>('enableStatusItem', true)) {
-    statusItem = workspace.createStatusBarItem(0)
+    statusItem = window.createStatusBarItem(0)
     statusItem.text = ''
     statusItem.show()
   }
