@@ -6,14 +6,12 @@
   "publisher": "chemzqm",
   "keywords": [
     "coc.nvim",
-    "input",
-    "colors"
+    "input"
   ],
   "engines": {
     "coc": "^0.0.80"
   },
   "scripts": {
-    "clean": "rimraf lib",
     "build": "tsc -p tsconfig.json",
     "postinstall": "./build.sh",
     "prepare": "tsc -p tsconfig.json"
@@ -47,8 +45,7 @@
   "devDependencies": {
     "@chemzqm/tsconfig": "^0.0.3",
     "@types/node": "^10.12.24",
-    "coc.nvim": "^0.0.80",
-    "rimraf": "^2.6.3",
+    "coc.nvim": "0.0.81-next.29",
     "typescript": "^4.1.3"
   },
   "dependencies": {}

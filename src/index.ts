@@ -14,8 +14,13 @@ async function selectInput(method: string): Promise<void> {
 }
 
 export async function activate(context: ExtensionContext): Promise<void> {
-  if (os.platform() != 'darwin') return
-  let { subscriptions, logger } = context
+  let { subscriptions } = context
+  let channel = window.createOutputChannel('imselect')
+  subscriptions.push(channel)
+  if (os.platform() != 'darwin') {
+    channel.appendLine(`[Error] coc-imselect works on mac only.`)
+    return
+  }
   let { nvim } = workspace
   let config = workspace.getConfiguration('imselect')
   let defaultInput = config.get<string>('defaultInput', 'com.apple.keylayout.US')
@@ -25,6 +30,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   let task = workspace.createTask('IMSELECT')
   let statusItem: StatusBarItem
   subscriptions.push(task)
+  subscriptions.push(floatFactory)
 
   let timer: NodeJS.Timer
   task.onStdout(async input => {
@@ -36,9 +42,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
     currentMethod = parts[1]
     if (timer) clearTimeout(timer)
     if (enableFloating) {
-      floatFactory.show([{ content: currentLang, filetype: '' }]).catch(e => {
-        logger.error(e)
-      })
+      floatFactory.show([{ content: currentLang, filetype: '' }])
       timer = setTimeout(() => {
         floatFactory.close()
       }, 500)
@@ -50,23 +54,23 @@ export async function activate(context: ExtensionContext): Promise<void> {
   })
   task.onExit(code => {
     if (code != 0) {
-      window.showMessage(`imselect observer exit with code ${code}`)
+      window.showErrorMessage(`imselect observer exit with code ${code}`)
     }
   })
   task.start({
     cmd,
     pty: true
   }).then(() => {
-    logger.info('Observer for input change started')
+    channel.appendLine(`[Info] Observer for input change started`)
   }, e => {
-    logger.error(e)
+    channel.appendLine(`[Error] Observer error: ${e.message}`)
   })
 
   async function selectDefault(): Promise<void> {
     try {
       await selectInput(defaultInput)
     } catch (e) {
-      logger.error(e.message)
+      window.showErrorMessage(`Error on select input method: ${e.message}`)
     }
   }
 
@@ -82,36 +86,32 @@ export async function activate(context: ExtensionContext): Promise<void> {
     callback: selectDefault
   }))
 
-  // subscriptions.push(workspace.registerAutocmd({
-  //   event: 'CmdlineLeave',
-  //   request: false,
-  //   callback: async () => {
-  //     let m = await workspace.nvim.mode
-  //     if (m.blocking) return
-  //     if (m.mode.startsWith('n')) await selectDefault()
-  //   }
-  // }))
+  let timeout: NodeJS.Timeout
+  events.on('InsertEnter', async (bufnr) => {
+    if (timeout) clearTimeout(timeout)
+    timeout = setTimeout(() => {
+      if (events.insertMode && workspace.bufnr == bufnr) {
+        let method = method_cache.get(bufnr)
+        if (method && method != currentMethod) {
+          void selectInput(method)
+        }
+      }
+    }, 50)
+  }, null, subscriptions)
 
-  events.on('InsertEnter', async () => {
-    let { bufnr } = workspace
-    let method = method_cache.get(bufnr)
-    if (method && method != currentMethod) {
-      await selectInput(method)
-    }
+  events.on('InsertLeave', async bufnr => {
+    if (timeout) clearTimeout(timeout)
+    method_cache.set(bufnr, currentMethod)
+    timeout = setTimeout(async () => {
+      if (!events.insertMode) {
+        void selectDefault()
+      }
+    }, 50)
   }, null, subscriptions)
 
   events.on('FocusGained', async () => {
-    let mode = await workspace.nvim.call('mode') as string
-    if (mode.startsWith('n')) await selectDefault()
+    if (!events.insertMode) await selectDefault()
   })
-
-  events.on('InsertLeave', async bufnr => {
-    method_cache.set(bufnr, currentMethod)
-    setTimeout(async () => {
-      let mode = await workspace.nvim.call('mode') as string
-      if (mode.startsWith('n')) await selectDefault()
-    }, 50)
-  }, null, subscriptions)
 
   workspace.onDidCloseTextDocument(document => {
     let doc = workspace.getDocument(document.uri)

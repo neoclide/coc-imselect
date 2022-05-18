@@ -9,27 +9,25 @@
 #import <Carbon/Carbon.h>
 
 int main(int argc, const char * argv[]) {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
-    int returnCode = 0;
-
-    if (argc > 1) {
-        NSString *imId = [NSString stringWithUTF8String:argv[1]];
-        NSDictionary *filter = [NSDictionary dictionaryWithObject:imId forKey:(NSString *)kTISPropertyInputSourceID];
-        CFArrayRef keyboards = TISCreateInputSourceList((CFDictionaryRef)filter, false);
-        if (keyboards) {
-            TISInputSourceRef selected = (TISInputSourceRef)CFArrayGetValueAtIndex(keyboards, 0);
-            returnCode = TISSelectInputSource(selected);
-            CFRelease(keyboards);
+    int ret = 0;
+    @autoreleasepool {
+        if (argc > 1) {
+            NSString *inputSource = [NSString stringWithUTF8String:argv[1]];
+            NSDictionary *filter = [NSDictionary dictionaryWithObject:inputSource forKey:(NSString *)kTISPropertyInputSourceID];
+            CFArrayRef keyboards = TISCreateInputSourceList((__bridge CFDictionaryRef)filter, false);
+            if (keyboards) {
+                TISInputSourceRef selected = (TISInputSourceRef)CFArrayGetValueAtIndex(keyboards, 0);
+                ret = TISSelectInputSource(selected);
+                CFRelease(keyboards);
+            } else {
+                ret = 1;
+            }
         } else {
-            returnCode = 1;
+            TISInputSourceRef currentInputSource = TISCopyCurrentKeyboardInputSource();
+            NSString *sourceId = (__bridge NSString *)(TISGetInputSourceProperty(currentInputSource, kTISPropertyInputSourceID));
+            printf("%s\n", [sourceId UTF8String]);
+            CFRelease(currentInputSource);
         }
-    } else {
-        returnCode = 1;
     }
-
-    [pool release];
-
-    return returnCode;
+    return ret;
 }
-
