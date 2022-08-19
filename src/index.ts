@@ -1,5 +1,5 @@
 import { exec } from 'child_process'
-import { events, ExtensionContext, FloatFactory, StatusBarItem, window, workspace } from 'coc.nvim'
+import { Disposable, events, ExtensionContext, FloatFactory, StatusBarItem, window, workspace } from 'coc.nvim'
 import os from 'os'
 import path from 'path'
 import { promisify } from 'util'
@@ -52,19 +52,25 @@ export async function activate(context: ExtensionContext): Promise<void> {
       statusItem.text = currentLang
     }
   })
+  let exitTimer: NodeJS.Timeout
   task.onExit(code => {
     if (code != 0) {
-      window.showErrorMessage(`imselect observer exit with code ${code}`)
+      setTimeout(() => {
+        window.showErrorMessage(`imselect observer exit with code ${code}`)
+      }, 500)
     }
   })
-  task.start({
-    cmd,
-    pty: true
-  }).then(() => {
-    channel.appendLine(`[Info] Observer for input change started`)
-  }, e => {
-    channel.appendLine(`[Error] Observer error: ${e.message}`)
-  })
+  let running = await task.running
+  if (!running) {
+    task.start({
+      cmd,
+      pty: true
+    }).then(() => {
+      channel.appendLine(`[Info] Observer for input change started`)
+    }, e => {
+      channel.appendLine(`[Error] Observer error: ${e.message}`)
+    })
+  }
 
   async function selectDefault(): Promise<void> {
     try {
@@ -108,6 +114,12 @@ export async function activate(context: ExtensionContext): Promise<void> {
       }
     }, 50)
   }, null, subscriptions)
+
+  subscriptions.push(Disposable.create(() => {
+    if (timer) clearTimeout(timer)
+    if (timeout) clearTimeout(timeout)
+    if (exitTimer) clearTimeout(exitTimer)
+  }))
 
   events.on('FocusGained', async () => {
     if (!events.insertMode) await selectDefault()
