@@ -86,11 +86,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
     statusItem.show()
   }
 
-  subscriptions.push(workspace.registerAutocmd({
-    event: 'VimLeavePre',
-    request: true,
-    callback: selectDefault
-  }))
+  // subscriptions.push(workspace.registerAutocmd({
+  //   event: 'VimLeavePre',
+  //   request: true,
+  //   callback: selectDefault
+  // }))
 
   let timeout: NodeJS.Timeout
   events.on('InsertEnter', async (bufnr) => {
