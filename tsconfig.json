@@ -3,9 +3,11 @@
   "compilerOptions": {
     "outDir": "lib",
     "target": "es2017",
-    "module": "commonjs",
+    "module": "node16",
+    "rootDir": "./src",
     "noUnusedLocals": true,
-    "moduleResolution": "node",
+    "useUnknownInCatchVariables": false,
+    "moduleResolution": "node16",
     "lib": ["es2018"],
     "plugins": []
   },

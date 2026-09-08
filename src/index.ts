@@ -1,7 +1,7 @@
 import { exec } from 'child_process'
-import { Disposable, events, ExtensionContext, FloatFactory, StatusBarItem, window, workspace } from 'coc.nvim'
-import os from 'os'
+import { Disposable, events, ExtensionContext, StatusBarItem, window, workspace } from 'coc.nvim'
 import path from 'path'
+import WebSocket from 'ws'
 import { promisify } from 'util'
 
 const method_cache: Map<number, string> = new Map()
@@ -14,65 +14,49 @@ async function selectInput(method: string): Promise<void> {
 }
 
 export async function activate(context: ExtensionContext): Promise<void> {
-  let { subscriptions } = context
+  const ws = new WebSocket('ws://127.0.0.1:8088')
   let channel = window.createOutputChannel('imselect')
+  let { subscriptions } = context
   subscriptions.push(channel)
-  if (os.platform() != 'darwin') {
-    channel.appendLine(`[Error] coc-imselect works on mac only.`)
-    return
-  }
-  let { nvim } = workspace
   let config = workspace.getConfiguration('imselect')
   let defaultInput = config.get<string>('defaultInput', 'com.apple.keylayout.US')
-  let enableFloating = config.get<boolean>('enableFloating', true)
-  let floatFactory = new FloatFactory(nvim)
-  let cmd = path.join(__dirname, '../bin/observer')
-  let task = workspace.createTask('IMSELECT')
-  let statusItem: StatusBarItem
-  subscriptions.push(task)
-  subscriptions.push(floatFactory)
+  let connected = false
+  ws.on('open', () => {
+    connected = true
+    channel.appendLine(`[Info] Socket connected.`)
+  })
+  let timer
+  ws.on('close', () => {
+    connected = false
+    timer = setTimeout(() => {
+      window.showErrorMessage(`imselect socket disconnected.`)
+      channel.appendLine(`[Info] Socket closed.`)
+    }, 100)
+  })
 
-  let timer: NodeJS.Timer
-  task.onStdout(async input => {
-    let curr = input[input.length - 1].trim()
-    if (!curr) return
-    let parts = curr.split(/\s/, 2)
-    if (currentLang == parts[0]) return
-    currentLang = parts[0]
-    currentMethod = parts[1]
-    if (timer) clearTimeout(timer)
-    if (enableFloating) {
-      floatFactory.show([{ content: currentLang, filetype: '' }])
-      timer = setTimeout(() => {
-        floatFactory.close()
-      }, 500)
+  subscriptions.push({
+    dispose: () => {
+      connected = false
+      clearTimeout(timer)
+      ws.terminate()
     }
-    // show float buffer
+  })
+  process.on('exit', () => {
+    ws.terminate()
+  })
+  ws.on('message', (data) => {
+    const status = JSON.parse(data)
+    currentMethod = status.sourceID
+    currentLang = status.isChinese ? 'zh-CN' : 'en-US'
     if (statusItem) {
       statusItem.text = currentLang
     }
   })
-  let exitTimer: NodeJS.Timeout
-  task.onExit(code => {
-    if (code != 0) {
-      setTimeout(() => {
-        window.showErrorMessage(`imselect observer exit with code ${code}`)
-      }, 500)
-    }
-  })
-  let running = await task.running
-  if (!running) {
-    task.start({
-      cmd,
-      pty: true
-    }).then(() => {
-      channel.appendLine(`[Info] Observer for input change started`)
-    }, e => {
-      channel.appendLine(`[Error] Observer error: ${e.message}`)
-    })
-  }
+  let statusItem: StatusBarItem
 
+  let exitTimer: NodeJS.Timeout
   async function selectDefault(): Promise<void> {
+    if (currentLang === 'en-US') return
     try {
       await selectInput(defaultInput)
     } catch (e) {
@@ -116,7 +100,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
   }, null, subscriptions)
 
   subscriptions.push(Disposable.create(() => {
-    if (timer) clearTimeout(timer)
     if (timeout) clearTimeout(timeout)
     if (exitTimer) clearTimeout(exitTimer)
   }))
