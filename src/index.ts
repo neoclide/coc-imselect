@@ -25,6 +25,10 @@ export async function activate(context: ExtensionContext): Promise<void> {
     connected = true
     channel.appendLine(`[Info] Socket connected.`)
   })
+  ws.on('error', (error: Error) => {
+    connected = false
+    channel.appendLine(`[Error] Socket error: ${error.message}`)
+  })
   let timer
   ws.on('close', () => {
     connected = false
