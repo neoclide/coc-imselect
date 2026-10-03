@@ -14,7 +14,8 @@
   "scripts": {
     "build": "node esbuild.js",
     "postinstall": "./build.sh",
-    "prepare": "tsc -p tsconfig.json"
+    "prepare": "tsc -p tsconfig.json && npm run build",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "activationEvents": [
     "*"
@@ -44,12 +45,13 @@
   "license": "MIT",
   "devDependencies": {
     "@chemzqm/tsconfig": "^0.0.3",
-    "@types/node": "^20.19",
+    "@types/node": "^20.19.43",
     "coc.nvim": "^0.0.83-next.25",
-    "typescript": "^6.0.3",
-    "esbuild": "^0.25.0"
+    "esbuild": "^0.28.2",
+    "typescript": "6.0.3"
   },
   "dependencies": {
     "ws": "^8.21.3"
-  }
+  },
+  "packageManager": "npm@11.9.0"
 }
