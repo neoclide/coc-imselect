@@ -20,18 +20,14 @@ export async function activate(context: ExtensionContext): Promise<void> {
   subscriptions.push(channel)
   let config = workspace.getConfiguration('imselect')
   let defaultInput = config.get<string>('defaultInput', 'com.apple.keylayout.US')
-  let connected = false
   ws.on('open', () => {
-    connected = true
     channel.appendLine(`[Info] Socket connected.`)
   })
   ws.on('error', (error: Error) => {
-    connected = false
     channel.appendLine(`[Error] Socket error: ${error.message}`)
   })
   let timer
   ws.on('close', () => {
-    connected = false
     timer = setTimeout(() => {
       window.showErrorMessage(`imselect socket disconnected.`)
       channel.appendLine(`[Info] Socket closed.`)
@@ -40,7 +36,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   subscriptions.push({
     dispose: () => {
-      connected = false
       clearTimeout(timer)
       ws.terminate()
     }
