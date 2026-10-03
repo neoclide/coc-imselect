@@ -16,7 +16,7 @@ CocInstall coc-imselect
 
 ## Development
 
-Use npm 11.9.0 with Node.js 20.17 or newer. On macOS, install the Xcode
+Use npm 11.9.0 with Node.js 20.19 or newer. On macOS, install the Xcode
 command-line tools, then run:
 
 ```sh
